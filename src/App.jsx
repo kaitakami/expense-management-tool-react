@@ -1,25 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import IconNewExpense from "./assets/new-expense.svg";
 import Modal from "./components/Modal";
+import ExpensesList from "./components/ExpensesList";
+import { generateId } from "./helpers";
+import IconNewExpense from "./assets/new-expense.svg";
 
 function App() {
   const [budget, setBudget] = useState(0);
   const [isValidBudget, setIsValidBudget] = useState(false);
   const [modal, setModal] = useState(false);
-  const [animateModal, setAnimateModal] = useState(false)
+  const [animateModal, setAnimateModal] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [editExpense, setEditExpense] = useState({});
+
+  useEffect(() => {
+    if (Object.keys(editExpense).length > 0) {
+      setModal(true);
+
+      setTimeout(() => {
+        setAnimateModal(true);
+      }, 500);
+    }
+  }, [editExpense]);
 
   const handleNewExpense = () => {
     setModal(true);
+    setEditExpense({});
 
     setTimeout(() => {
-      setAnimateModal(true)
-    }, 500)
+      setAnimateModal(true);
+    }, 500);
+  };
+
+  const saveExpense = (expense) => {
+    if (expense.id) {
+      const updatedExpenses = expenses.map((expenseState) =>
+        expenseState.id === expense.id ? expense : expenseState
+      );
+      setExpenses(updatedExpenses);
+      setEditExpense({})
+    } else {
+      expense.id = generateId();
+      expense.date = Date.now();
+      setExpenses([...expenses, expense]);
+    }
+
+    setAnimateModal(false);
+    setTimeout(() => {
+      setModal(false);
+    }, 500);
+  };
+
+  const removeExpense = (id) => {
+    const updatedExpenses = expenses.filter((expense) => expense.id != id);
+    setExpenses(updatedExpenses);
   };
 
   return (
-    <div>
+    <div className={modal ? "pin" : ""}>
       <Header
+        expenses={expenses}
         budget={budget}
         setBudget={setBudget}
         isValidBudget={isValidBudget}
@@ -27,16 +67,34 @@ function App() {
       />
 
       {isValidBudget && (
-        <div className="new-expense">
-          <img
-            src={IconNewExpense}
-            alt="icon new expense"
-            onClick={handleNewExpense}
-          />
-        </div>
+        <>
+          <main>
+            <ExpensesList
+              expenses={expenses}
+              setEditExpense={setEditExpense}
+              removeExpense={removeExpense}
+            />
+          </main>
+          <div className="new-expense">
+            <img
+              src={IconNewExpense}
+              alt="icon new expense"
+              onClick={handleNewExpense}
+            />
+          </div>
+        </>
       )}
 
-      {modal && <Modal setModal={setModal} animateModal={animateModal} setAnimateModal={setAnimateModal} />}
+      {modal && (
+        <Modal
+          setModal={setModal}
+          animateModal={animateModal}
+          setAnimateModal={setAnimateModal}
+          saveExpense={saveExpense}
+          editExpense={editExpense}
+          setEditExpense={setEditExpense}
+        />
+      )}
     </div>
   );
 }

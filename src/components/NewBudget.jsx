@@ -12,15 +12,17 @@ const NewBudget = ({ budget, setBudget, setIsValidBudget }) => {
       return;
     }
     setMessage("");
-    setIsValidBudget(true)
+    setIsValidBudget(true);
   };
 
   return (
     <div className="container-budget container shadow">
       <form onSubmit={handleBudget} className="form">
         <div className="field">
-          <label>Define budget</label>
+          <label></label>
+          <label htmlFor="defineBudget">Define budget</label>
           <input
+            id="defineBudget"
             type="number"
             className="new-budget"
             placeholder="Add your budget"
