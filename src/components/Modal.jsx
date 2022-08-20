@@ -14,22 +14,22 @@ const Modal = ({
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
-  const [date, setDate] = useState('')
-  const [id, setId] = useState('')
+  const [date, setDate] = useState("");
+  const [id, setId] = useState("");
 
   useEffect(() => {
     if (Object.keys(editExpense).length > 0) {
       setName(editExpense.name);
       setQuantity(editExpense.quantity);
       setCategory(editExpense.category);
-      setId(editExpense.id)
-      setDate(editExpense.date)
+      setId(editExpense.id);
+      setDate(editExpense.date);
     }
   }, [editExpense]);
 
   const hideModal = () => {
     setAnimateModal(false);
-    setEditExpense({})
+    setEditExpense({});
     setTimeout(() => {
       setModal(false);
     }, 500);
@@ -98,7 +98,10 @@ const Modal = ({
             <option value="subscriptions">Subscriptions</option>
           </select>
         </div>
-        <input type="submit" value={editExpense.name ? 'Save changes' : 'Add Expense'} />
+        <input
+          type="submit"
+          value={editExpense.name ? "Save changes" : "Add Expense"}
+        />
       </form>
     </div>
   );
