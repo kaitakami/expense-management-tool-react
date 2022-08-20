@@ -2,16 +2,25 @@ import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Modal from "./components/Modal";
 import ExpensesList from "./components/ExpensesList";
+import Filters from "./components/Filters";
 import { generateId } from "./helpers";
 import IconNewExpense from "./assets/new-expense.svg";
 
 function App() {
-  const [budget, setBudget] = useState(0);
+  const [budget, setBudget] = useState(
+    Number(localStorage.getItem("budget")) ?? 0
+  );
   const [isValidBudget, setIsValidBudget] = useState(false);
   const [modal, setModal] = useState(false);
   const [animateModal, setAnimateModal] = useState(false);
-  const [expenses, setExpenses] = useState([]);
+  const [expenses, setExpenses] = useState(
+    localStorage.getItem("expenses")
+      ? JSON.parse(localStorage.getItem("expenses"))
+      : []
+  );
   const [editExpense, setEditExpense] = useState({});
+  const [filter, setFilter] = useState("");
+  const [filteredExpenses, setFilterExpenses] = useState([]);
 
   useEffect(() => {
     if (Object.keys(editExpense).length > 0) {
@@ -22,6 +31,31 @@ function App() {
       }, 500);
     }
   }, [editExpense]);
+
+  useEffect(() => {
+    localStorage.setItem("budget", budget ?? 0);
+  }, [budget]);
+
+  useEffect(() => {
+    localStorage.setItem("expenses", JSON.stringify(expenses) ?? []);
+  }, [expenses]);
+
+  useEffect(() => {
+    const budgetLS = Number(localStorage.getItem("budget")) ?? 0;
+    if (budgetLS > 0) {
+      setIsValidBudget(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (filter) {
+      const filteredExpenses = expenses.filter(
+        (expense) => expense.category === filter
+      );
+
+      setFilterExpenses(filteredExpenses);
+    }
+  }, [filter]);
 
   const handleNewExpense = () => {
     setModal(true);
@@ -38,7 +72,7 @@ function App() {
         expenseState.id === expense.id ? expense : expenseState
       );
       setExpenses(updatedExpenses);
-      setEditExpense({})
+      setEditExpense({});
     } else {
       expense.id = generateId();
       expense.date = Date.now();
@@ -60,6 +94,7 @@ function App() {
     <div className={modal ? "pin" : ""}>
       <Header
         expenses={expenses}
+        setExpenses={setExpenses}
         budget={budget}
         setBudget={setBudget}
         isValidBudget={isValidBudget}
@@ -69,10 +104,13 @@ function App() {
       {isValidBudget && (
         <>
           <main>
+            <Filters filter={filter} setFilter={setFilter} />
             <ExpensesList
               expenses={expenses}
               setEditExpense={setEditExpense}
               removeExpense={removeExpense}
+              filter={filter}
+              filteredExpenses={filteredExpenses}
             />
           </main>
           <div className="new-expense">
