@@ -440,3 +440,19 @@ body .modal {
     font-size: 2.4rem;
     text-align: right;
 }
+
+@media (max-width: 400px) {
+
+    .form input,
+    .form select,
+    .form input[type="submit"] {
+        width: 85%;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
